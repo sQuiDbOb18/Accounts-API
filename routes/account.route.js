@@ -21,6 +21,7 @@ const {
   changePassword
 } = require('../controllers/account.controller')
 
+const { apiLimiter, loginLimiter } = require(`../middleware/rateLimiter`)
 const { protect, authRoles } = require('../middleware/auth')
 
 const validate = require(`../middleware/validate`)
@@ -29,8 +30,8 @@ const { registerSchema, loginSchema, resetPasswordSchema, changePasswordSchema, 
 router.get(`/get`, protect, authRoles(`admin`), getAccount)
 router.get(`/`, filterAccounts, protect, authRoles(`admin`), getAllAccounts)
 router.get('/me', protect, getMyAccount)
-router.post(`/register`, validate(registerSchema), register)
-router.post('/login', validate(loginSchema), login)
+router.post(`/register`, apiLimiter, validate(registerSchema), register)
+router.post('/login', loginLimiter, validate(loginSchema), login)
 router.post('/forgot-password', forgotPassword)
 router.post(`/reset-password/:token`, validate(resetPasswordSchema), resetPassword)
 router.post(`/request`, requestOTP)
